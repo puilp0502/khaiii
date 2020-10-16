@@ -109,7 +109,11 @@ void Sentence::_tokenize() {
 
 void Sentence::_characterize() {
     assert(_raw != nullptr);
-    auto en_US_utf8 = locale("en_US.UTF-8");
+    // emscripten does not support locale other than "C".
+    // Since all we need is UTF8 Encoding, we just use "C.UTF-8"
+    // TODO Since V8 stores string in UTF-16, it might be possible to 
+    //      Just skip this characterization process and rawcopy the string data
+    auto en_US_utf8 = locale("C.UTF-8");
     auto& facet = use_facet<codecvt<wchar_t, char, mbstate_t>>(en_US_utf8);
     auto mbst = mbstate_t();
     const char* from_next = nullptr;

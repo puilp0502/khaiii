@@ -51,6 +51,24 @@ endif()
 
 set(CMAKE_DEBUG_POSTFIX "_debug")
 
+if (EMSCRIPTEN)
+    # Emscripten을 사용해서 컴파일이 가능하게 합니다.
+    # 아래 세 옵션을 설정하지 않을 경우, Hunter가 ABI 감지 실패 오류를 발생시킵니다.
+    set(CMAKE_C_ABI_COMPILED ON)
+    set(CMAKE_CXX_ABI_COMPILED ON)
+    set(CMAKE_CROSSCOMPILING ON)
+    # 기본적으로 Emscripten은 성능 문제로 인해 컴파일 된 바이너리에서 C++ 내 Exception Catching 지원을 추가하지 않습니다.
+    # Khaiii는 API 함수들 내부에서 Exception handling을 처리하므로, 지원을 추가합니다.
+    add_definitions(-sDISABLE_EXCEPTION_CATCHING=0)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_definitions(-g4)
+    endif()
+endif()
+
+message("CMAKE_C_ABI_COMPILED: ${CMAKE_C_ABI_COMPILED}")
+message("CMAKE_CXX_ABI_COMPILED: ${CMAKE_CXX_ABI_COMPILED}")
+message("CMAKE_CROSSCOMPILING: ${CMAKE_CROSSCOMPILING}")
+
 # dependent 3rd party libraries
 hunter_add_package(Boost)
 find_package(Boost CONFIG REQUIRED)
